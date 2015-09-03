@@ -424,12 +424,16 @@ public class ROIHandler {
    * @return See above
    */
   public static Roi[] readFromOverlays() {
-
     ImagePlus image = IJ.getImage();
     Overlay overlay = image.getOverlay();
     if (overlay == null) return null;
-    return overlay.toArray();
-
+    
+    // Set image in ROIs
+    Roi[] rois = overlay.toArray();
+    for (Roi r : rois) {
+      r.setImage(image);
+    }
+    return rois;
   }
 
   /**
@@ -460,6 +464,36 @@ public class ROIHandler {
       int c = ijRoi.getCPosition()-1;
       int z = ijRoi.getZPosition()-1;
       int t = ijRoi.getTPosition()-1;
+      
+      if (c < 0 && z < 0 && t < 0) {
+        int pos = ijRoi.getPosition()-1;
+
+        // Check if position is set instead
+        if (pos >= 0) {
+          ImagePlus imp = ijRoi.getImage();
+
+          if (imp != null) {
+            int channels = imp.getNChannels();
+            int slices = imp.getNSlices();
+            int frames = imp.getNFrames();
+
+            if (channels > 1) {
+              c = pos;
+              z = 0;
+              t = 0;
+            } else if (slices > 1) {
+              c = 0;
+              z = pos;
+              t = 0;
+            } else if (frames > 1) {
+              c = 0;
+              z = 0;
+              t = pos;
+            }
+          }
+        }
+      }
+      
       if (ijRoi.isDrawingTool()){//Checks if the given roi is a Text box/Arrow/Rounded Rectangle
         if (ijRoi.getTypeAsString().matches("Text")) {
           if (ijRoi instanceof TextRoi){
