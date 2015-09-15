@@ -415,9 +415,18 @@ public class ROIHandler {
    */
   public static Roi[] readFromRoiManager() {
 
+    ImagePlus image = IJ.getImage();
     RoiManager manager = RoiManager.getInstance();
+
     if (manager == null) return null;
-    return manager.getRoisAsArray();
+
+    // Set image in ROIs
+    Roi[] rois = manager.getRoisAsArray();
+    for (Roi r : rois) {
+        r.setImage(image);
+    }
+
+    return rois;
   }
 
   /**
@@ -428,8 +437,14 @@ public class ROIHandler {
 
     ImagePlus image = IJ.getImage();
     Overlay overlay = image.getOverlay();
-    if (overlay == null) return null;
-    return overlay.toArray();
+
+    // Set image in ROIs
+    Roi[] rois = overlay.toArray();
+    for (Roi r : rois) {
+        r.setImage(image);
+    }
+
+    return rois;
 
   }
 
