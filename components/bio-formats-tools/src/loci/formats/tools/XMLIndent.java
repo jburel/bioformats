@@ -49,12 +49,16 @@ public class XMLIndent {
     throws IOException
   {
     StringBuffer sb = new StringBuffer();
-    while (true) {
-      String line = in.readLine();
-      if (line == null) break;
-      sb.append(line);
+    try {
+      while (true) {
+        String line = in.readLine();
+        if (line == null) break;
+          sb.append(line);
+        }
+    } finally {
+      in.close();
     }
-    in.close();
+
     System.out.println(XMLTools.indentXML(sb.toString(), 3, keepValid));
   }
 
