@@ -68,8 +68,6 @@ import loci.formats.gui.BufferedImageReader;
 import loci.formats.gui.ImageViewer;
 import loci.formats.in.DynamicMetadataOptions;
 import loci.formats.in.MetadataLevel;
-import loci.formats.in.MetadataOptions;
-import loci.formats.in.OMETiffReader;
 import loci.formats.meta.MetadataRetrieve;
 import loci.formats.meta.MetadataStore;
 import loci.formats.services.OMEXMLService;
@@ -382,27 +380,28 @@ public class ImageInfo {
   public void mapLocation() throws IOException {
     if (map != null) Location.mapId(id, map);
     else if (preload) {
-      RandomAccessInputStream f = new RandomAccessInputStream(id);
-      if (!(reader instanceof ImageReader)) {
-        // verify format
-        LOGGER.info("Checking {} format [{}]", reader.getFormat(),
-                    reader.isThisType(f) ? "yes" : "no");
-        f.seek(0);
+      byte[] b = null;
+      try (RandomAccessInputStream f = new RandomAccessInputStream(id)) {
+        if (!(reader instanceof ImageReader)) {
+          // verify format
+          LOGGER.info("Checking {} format [{}]", reader.getFormat(),
+                      reader.isThisType(f) ? "yes" : "no");
+          f.seek(0);
+        }
+        int len = (int) f.length();
+        LOGGER.info("Caching {} bytes:", len);
+        b = new byte[len];
+        int blockSize = 8 * 1024 * 1024; // 8 MB
+        int read = 0, left = len;
+        while (left > 0) {
+          int r = f.read(b, read, blockSize < left ? blockSize : left);
+          read += r;
+          left -= r;
+          float ratio = (float) read / len;
+          int p = (int) (100 * ratio);
+          LOGGER.info("\tRead {} bytes ({}% complete)", read, p);
+        }
       }
-      int len = (int) f.length();
-      LOGGER.info("Caching {} bytes:", len);
-      byte[] b = new byte[len];
-      int blockSize = 8 * 1024 * 1024; // 8 MB
-      int read = 0, left = len;
-      while (left > 0) {
-        int r = f.read(b, read, blockSize < left ? blockSize : left);
-        read += r;
-        left -= r;
-        float ratio = (float) read / len;
-        int p = (int) (100 * ratio);
-        LOGGER.info("\tRead {} bytes ({}% complete)", read, p);
-      }
-      f.close();
       ByteArrayHandle file = new ByteArrayHandle(b);
       Location.mapFile(id, file);
     }
