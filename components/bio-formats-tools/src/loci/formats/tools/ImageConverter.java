@@ -401,10 +401,11 @@ public final class ImageConverter {
       if (overwrite == null) {
         LOGGER.warn("Output file {} exists.", out);
         LOGGER.warn("Do you want to overwrite it? ([y]/n)");
-        BufferedReader r = new BufferedReader(
-          new InputStreamReader(System.in, Constants.ENCODING));
-        String choice = r.readLine().trim().toLowerCase();
-        overwrite = !choice.startsWith("n");
+        try (BufferedReader r = new BufferedReader(
+          new InputStreamReader(System.in, Constants.ENCODING))) {
+          String choice = r.readLine().trim().toLowerCase();
+          overwrite = !choice.startsWith("n");
+        }
       }
       if (!overwrite) {
         LOGGER.warn("Exiting; next time, please specify an output file that " +
@@ -702,6 +703,9 @@ public final class ImageConverter {
     return true;
   }
 
+  public void close() throws IOException {
+      reader.close();
+  }
   // -- Helper methods --
 
   /**
@@ -1016,7 +1020,11 @@ public final class ImageConverter {
   public static void main(String[] args) throws FormatException, IOException {
     DebugTools.enableLogging("INFO");
     ImageConverter converter = new ImageConverter();
-    if (!converter.testConvert(new ImageWriter(), args)) System.exit(1);
+    try {
+      if (!converter.testConvert(new ImageWriter(), args)) System.exit(1);
+    } finally {
+      converter.close();
+    }
     System.exit(0);
   }
 
