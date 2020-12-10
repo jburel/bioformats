@@ -37,6 +37,7 @@ jobs:
             echo ::set-output name=server::'ome.staging'
           else
             echo ::set-output name=server::'ome.staging'
+          fi
       - name: Build
         run: mvn ${{ env.maven_commands }}
   deploy:
@@ -52,6 +53,7 @@ jobs:
             echo ::set-output name=server::'ome.staging'
           else
             echo ::set-output name=server::'ome.staging'
+          fi
       - name: Set up Repository
         uses: actions/setup-java@v1
         with:
