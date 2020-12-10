@@ -31,10 +31,21 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Get version
+        id: get_version
         run: |
           VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
           echo $VERSION
           echo "::set-output name=version::$VERSION"
+      - name: Retrieve server
+        id: get_server
+        run: |
+          if [${{ steps.get_version.outputs.version }} ~= 'SNAPSHOT']; then
+            echo "SNAPSHOT"
+          else
+            echo "Tag"
+          fi
+
+
   deploy:
     if: contains('refs/heads/develop', github.ref) ||  startsWith(github.ref, 'refs/tags')
     needs: build
