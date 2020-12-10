@@ -39,7 +39,7 @@ jobs:
       - name: Retrieve server
         id: get_server
         run: |
-          if [ ${{ steps.get_version.outputs.version }} =~ 'SNAPSHOT']; then
+          if [[ ${{ steps.get_version.outputs.version }} =~ 'SNAPSHOT' ]]; then
             echo "SNAPSHOT"
           else
             echo "Tag"
