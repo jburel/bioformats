@@ -33,6 +33,7 @@ jobs:
       - name: Get version
         run: |
           VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+          echo $VERSION
           echo "::set-output name=version::$VERSION"
   deploy:
     if: contains('refs/heads/develop', github.ref) ||  startsWith(github.ref, 'refs/tags')
