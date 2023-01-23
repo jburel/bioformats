@@ -42,9 +42,6 @@ Type "ant -p" for a list of targets.
   </resolver:remoterepos>
   <!-- Main build targets -->
 
-  <target name="compile" depends="copy-resources" description="compile classes">
-    <mkdir dir="${classes.dir}"/>
-
     <path id="compile.classpath"/>
     <path id="runtime.classpath"/>
     <resolver:resolve>
@@ -54,6 +51,11 @@ Type "ant -p" for a list of targets.
       <path refid="compile.classpath" classpath="compile"/>
       <path refid="runtime.classpath" classpath="runtime"/>
     </resolver:resolve>
+
+  <target name="compile" depends="copy-resources" description="compile classes">
+    <mkdir dir="${classes.dir}"/>
+
+
 
     <javac
       classpathref="compile.classpath"
