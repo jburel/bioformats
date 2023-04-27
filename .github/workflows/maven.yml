@@ -26,14 +26,6 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'zulu'
           cache: 'maven'
-      - name: Build
-        run: mvn ${{ env.maven_commands }}
-  deploy_snapshots:
-    if: ${{ github.ref == 'refs/heads/develop' && github.repository_owner == 'ome' }}
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
       - name: Retrieve version
         id: get_version
         run: |
@@ -50,4 +42,5 @@ jobs:
       - name: Deploy SNAPSHOT
         if: ${{ steps.set_server.outputs.server == 'ome.snapshots' }}
         run: "echo foo"
+      
   
