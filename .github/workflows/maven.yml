@@ -40,7 +40,6 @@ jobs:
               echo server='ome.releases' >> $GITHUB_OUTPUT
           fi
       - name: Deploy SNAPSHOT
-        if: ${{ steps.set_server.outputs.server == 'ome.snapshots' }}
-        run: "echo foo"
+        run: echo ${{ steps.set_server.outputs.server }}
       
   
